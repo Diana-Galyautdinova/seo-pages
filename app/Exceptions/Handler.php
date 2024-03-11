@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -13,7 +14,7 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-        //
+        ValidationException::class,
     ];
 
     /**
@@ -37,5 +38,25 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * @param $request
+     * @param Throwable $e
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     */
+    public function render($request, Throwable $e)
+    {
+        $data = ['error' => substr((string)$e, 0, 150) . '...'];
+        $code = 500;
+
+        if ($e instanceof ValidationException) {
+            $data = $e->errors();
+            $code = 422;
+        }
+
+        return response()
+            ->json($data, $code)
+            ->setEncodingOptions(JSON_UNESCAPED_UNICODE);
     }
 }

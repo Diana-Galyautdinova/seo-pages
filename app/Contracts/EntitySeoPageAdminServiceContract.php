@@ -2,13 +2,13 @@
 
 namespace App\Contracts;
 
-use App\Dto\EntitySeoPageList;
 use App\Dto\EntitySeoPageRequest;
 use App\Entity\EntitySeoPage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface EntitySeoPageAdminServiceContract
 {
-    public function list(int $page, int $pageSize): EntitySeoPageList;
+    public function list(int $page, int $pageSize): LengthAwarePaginator;
 
     public function show(int $id): EntitySeoPage;
 

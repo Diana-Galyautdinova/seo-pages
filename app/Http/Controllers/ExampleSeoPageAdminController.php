@@ -2,68 +2,39 @@
 
 namespace App\Http\Controllers;
 
-//use Anflat\GRPC\Auth\Permissions\RuleType;
-//use Anflat\Microservice\Contracts\GrpcClient\AuthClientContract;
-//use Anflat\Microservice\Tools\CheckRuleHelper;
-use App\Exceptions\PermissionDeniedException;
-use App\Dto\Catalog\SeoPageFilterAddressRequest;
-use App\Dto\Catalog\SeoPageFilterRequest;
-use App\Dto\Catalog\SeoPageRequest as CatalogSeoPageRequest;
+use App\Dto\Example\SeoPageFilterRequest;
+use App\Dto\Example\SeoPageRequest as ExampleSeoPageRequest;
 use App\Dto\SeoPageRequest;
-use App\Http\Resources\CatalogSeoPageResource;
-use App\Services\Catalog\SeoPageAdminService;
+use App\Http\Resources\ExampleSeoPageResource;
+use App\Services\Example\SeoPageAdminService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
-class CatalogSeoPageAdminController extends Controller
+class ExampleSeoPageAdminController extends Controller
 {
-    public function __construct(protected AuthClientContract $authClient, protected SeoPageAdminService $service)
+    public function __construct(protected SeoPageAdminService $service)
     {
-        $this->checkRule();
+        //
     }
 
-    /**
-     * @return void
-     * @throws PermissionDeniedException
-     * @throws \Anflat\Microservice\Exceptions\InvalidRuleTypeException
-     */
-    protected function checkRule()
-    {
-        $ruleType = RuleType::SITE_CATALOG_SEO_PAGE;
-        $rules = $this->authClient->checkRule([$ruleType]);
-        if (!CheckRuleHelper::checkRule($ruleType, $rules)) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected function getRequest(Request $request): CatalogSeoPageRequest
+    protected function getRequest(Request $request): ExampleSeoPageRequest
     {
         $data = $request->all();
-        if (isset($data['seoPage']) && isset($data['seoPage']['filters']) && isset($data['seoPage']['filters']['address'])) {
-            $arr = [];
-            foreach ($data['seoPage']['filters']['address'] as $address) {
-                $arr[] = new SeoPageFilterAddressRequest(...$address);
-            }
-
-            $data['seoPage']['filters']['address'] = $arr;
-        }
-
-        $filterRequest = new SeoPageFilterRequest(...($data['seoPage'] ? $data['seoPage']['filters'] : []));
+        $filterRequest = new SeoPageFilterRequest(...(isset($data['seoPage']) ? $data['seoPage']['filters'] : []));
         $data['seoPage']['filters'] = $filterRequest;
         $seoRequest = new SeoPageRequest(...$data['seoPage']);
         $data['seoPage'] = $seoRequest;
 
-        return new CatalogSeoPageRequest(...$data);
+        return new ExampleSeoPageRequest(...$data);
     }
 
     /**
      * @OA\Get (
-     *     path="/api/v1/seo-page/catalog/",
-     *     summary="Сео страницы каталога",
-     *     operationId="siteCatalogSeoPageAdminList",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example/",
+     *     summary="Getting list of seo pages",
+     *     operationId="exampleSeoPageAdminList",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
@@ -83,7 +54,7 @@ class CatalogSeoPageAdminController extends Controller
      *          @OA\Property(
      *              property="data",
      *              type="array",
-     *              @OA\Items(ref="#/components/schemas/SiteCatalogSeoPage")
+     *              @OA\Items(ref="#/components/schemas/ExampleSeoPage")
      *          ),
      *       ),
      *     ),
@@ -105,20 +76,19 @@ class CatalogSeoPageAdminController extends Controller
         ]);
 
         $page = $request->get('page', 1);
-        $pageSize = config('pagination.per_page');
+        $pageSize = 15;
 
-        $PageList = $this->service->list($page, $pageSize);
-        $paginator = new LengthAwarePaginator($PageList->getData(), $PageList->getPageCount(), $pageSize, $page);
+        $paginator = $this->service->list($page, $pageSize);
 
-        return CatalogSeoPageResource::collection($paginator);
+        return ExampleSeoPageResource::collection($paginator);
     }
 
     /**
      * @OA\Get (
-     *     path="/api/v1/site/catalog/seo-page/{id}",
-     *     summary="Сео страница каталога",
-     *     operationId="siteCatalogSeoPageAdminShow",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example/{id}",
+     *     summary="Showing seo page",
+     *     operationId="exampleSeoPageAdminShow",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
@@ -138,12 +108,12 @@ class CatalogSeoPageAdminController extends Controller
      *          @OA\Property(
      *              property="data",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPage"
+     *              ref="#/components/schemas/ExampleSeoPage"
      *          ),
      *          @OA\Property(
      *              property="dictionary",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPageDistrict"
+     *              ref="#/components/schemas/ExampleSeoPageDistrict"
      *          ),
      *       ),
      *     ),
@@ -153,29 +123,29 @@ class CatalogSeoPageAdminController extends Controller
      *     )
      * )
      * @param int $id
-     * @return CatalogSeoPageResource
+     * @return ExampleSeoPageResource
      * @throws \App\Exceptions\SeoPageNotFoundException
      */
-    public function show(int $id): CatalogSeoPageResource
+    public function show(int $id): ExampleSeoPageResource
     {
         $res = $this->service->show($id);
 
-        return new CatalogSeoPageResource($res);
+        return new ExampleSeoPageResource($res);
     }
 
     /**
      * @OA\Post (
-     *     path="/api/v1/site/catalog/seo-page",
-     *     summary="Добавление Сео страницы каталога",
-     *     operationId="siteCatalogSeoPageAdminStore",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example",
+     *     summary="Adding seo page",
+     *     operationId="exampleSeoPageAdminStore",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             ref="#/components/schemas/SiteCatalogSeoPage"
+     *             ref="#/components/schemas/ExampleSeoPage"
      *         )
      *     ),
      *     @OA\Response(
@@ -185,12 +155,12 @@ class CatalogSeoPageAdminController extends Controller
      *          @OA\Property(
      *              property="data",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPage"
+     *              ref="#/components/schemas/ExampleSeoPage"
      *          ),
      *          @OA\Property(
      *              property="dictionary",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPageDistrict"
+     *              ref="#/components/schemas/ExampleSeoPageDistrict"
      *          ),
      *       ),
      *     ),
@@ -200,23 +170,23 @@ class CatalogSeoPageAdminController extends Controller
      *     )
      * )
      * @param Request $request
-     * @return CatalogSeoPageResource
+     * @return ExampleSeoPageResource
      * @throws ValidationException
      */
-    public function store(Request $request): CatalogSeoPageResource
+    public function store(Request $request): ExampleSeoPageResource
     {
         $dataRequest = $this->getRequest($request);
         $res = $this->service->store($dataRequest);
 
-        return new CatalogSeoPageResource($res);
+        return new ExampleSeoPageResource($res);
     }
 
     /**
      * @OA\Put (
-     *     path="/api/v1/site/catalog/seo-page/{id}",
-     *     summary="Обновление Сео страницы списков каталога",
-     *     operationId="siteCatalogSeoPageAdminUpdate",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example/{id}",
+     *     summary="Updating seo page",
+     *     operationId="exampleSeoPageAdminUpdate",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
@@ -232,7 +202,7 @@ class CatalogSeoPageAdminController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             ref="#/components/schemas/SiteCatalogSeoPage"
+     *             ref="#/components/schemas/ExampleSeoPage"
      *         ),
      *     ),
      *     @OA\Response(
@@ -242,12 +212,12 @@ class CatalogSeoPageAdminController extends Controller
      *          @OA\Property(
      *              property="data",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPage"
+     *              ref="#/components/schemas/ExampleSeoPage"
      *          ),
      *          @OA\Property(
      *              property="dictionary",
      *              type="object",
-     *              ref="#/components/schemas/SiteCatalogSeoPageDistrict"
+     *              ref="#/components/schemas/ExampleSeoPageDistrict"
      *          ),
      *       ),
      *     ),
@@ -258,24 +228,24 @@ class CatalogSeoPageAdminController extends Controller
      * )
      * @param int $id
      * @param Request $request
-     * @return CatalogSeoPageResource
+     * @return ExampleSeoPageResource
      * @throws ValidationException
      * @throws \App\Exceptions\SeoPageNotFoundException
      */
-    public function update(int $id, Request $request): CatalogSeoPageResource
+    public function update(int $id, Request $request): ExampleSeoPageResource
     {
         $dataRequest = $this->getRequest($request);
         $res = $this->service->update($id, $dataRequest);
 
-        return new CatalogSeoPageResource($res);
+        return new ExampleSeoPageResource($res);
     }
 
     /**
      * @OA\Delete (
-     *     path="/api/v1/site/catalog/seo-page/{id}",
-     *     summary="Удаление Сео страницы каталога",
-     *     operationId="siteCatalogSeoPageAdminDelete",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example/{id}",
+     *     summary="Removing seo page",
+     *     operationId="exampleSeoPageAdminDelete",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
@@ -305,10 +275,10 @@ class CatalogSeoPageAdminController extends Controller
 
     /**
      *  @OA\Get  (
-     *     path="/api/v1/site/catalog/seo-page/create",
-     *     summary="Дефолтные значения Сео страницы каталога",
-     *     operationId="siteCatalogSeoPageAdminCreate",
-     *     tags={"Site/Catalog/SeoPage"},
+     *     path="/api/seo-page/example/create",
+     *     summary="Default values for creating seo page",
+     *     operationId="exampleSeoPageAdminCreate",
+     *     tags={"Example/SeoPage"},
      *     security={
      *         {"bearer": {}},
      *     },
@@ -319,22 +289,17 @@ class CatalogSeoPageAdminController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 ref="#/components/schemas/SiteCatalogSeoPage"
-     *             ),
-     *             @OA\Property(
-     *                 property="dictionary",
-     *                 type="object",
-     *                 ref="#/components/schemas/SiteCatalogSeoPageDistrict"
-     *             ),
+     *                 ref="#/components/schemas/ExampleSeoPage"
+     *             )
      *         )
      *     )
      * )
-     * @return CatalogSeoPageResource
+     * @return ExampleSeoPageResource
      */
-    public function create(): CatalogSeoPageResource
+    public function create(): ExampleSeoPageResource
     {
         $data = $this->service->create();
 
-        return new CatalogSeoPageResource($data);
+        return new ExampleSeoPageResource($data);
     }
 }

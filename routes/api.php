@@ -19,18 +19,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group([
-    'prefix' => '/api/v1/site/seo-page',
+    'prefix' => '/seo-page',
     'namespace' => '\App\Http\Controllers'
-], function (Route $router) {
+], function ($router) {
     $router->group([
-        'prefix' => 'catalog',
-        'middleware' => 'auth'
-    ], function (Route $router) {
-        $router->get('', 'CatalogSeoPageAdminController@index');
-        $router->get('create', 'CatalogSeoPageAdminController@create');
-        $router->get('{id}', 'CatalogSeoPageAdminController@show');
-        $router->post('', 'CatalogSeoPageAdminController@store');
-        $router->put('{id}', 'CatalogSeoPageAdminController@update');
-        $router->delete('{id}', 'CatalogSeoPageAdminController@destroy');
+        'prefix' => 'example'
+    ], function ($router) {
+        $router->get('', 'ExampleSeoPageAdminController@index');
+        $router->get('create', 'ExampleSeoPageAdminController@create');
+        $router->get('{id}', 'ExampleSeoPageAdminController@show');
+        $router->post('', 'ExampleSeoPageAdminController@store');
+        $router->put('{id}', 'ExampleSeoPageAdminController@update');
+        $router->delete('{id}', 'ExampleSeoPageAdminController@destroy');
     });
 });

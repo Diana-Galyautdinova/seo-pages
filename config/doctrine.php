@@ -34,7 +34,7 @@ return [
             'namespaces'    => [],
             'paths'         => [
                 base_path('app/Entity'),
-                base_path('app/Entity/Catalog'),
+                base_path('app/Entity/ExampleEntity'),
             ],
             'repository'    => Doctrine\ORM\EntityRepository::class,
             'proxies'       => [

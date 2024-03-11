@@ -14,5 +14,5 @@ interface SeoPageRepository extends ObjectRepository
 
     public function save(SeoPage &$page): void;
 
-    public function findOneBySlug(string $slug): ?SeoPage;
+    public function findOneBySlug(string $slug): ?object;
 }

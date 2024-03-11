@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
-//use Anflat\DoctrineLaravelPagination\PaginationHelper;
 use App\Contracts\EntitySeoPageRepository;
 use App\Contracts\SeoPageGroupRepository;
 use App\Contracts\SeoPageRepository;
 use App\Contracts\EntitySeoPageAdminServiceContract;
-use App\Dto\EntitySeoPageList;
 use App\Dto\EntitySeoPageRequest;
 use App\Entity\EntitySeoPage;
 use App\Entity\SeoPage;
-use App\Entity\SeoPageGroup;
 use App\Exceptions\SeoPageNotFoundException;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -46,29 +44,18 @@ abstract class EntitySeoPageAdminService implements EntitySeoPageAdminServiceCon
     /**
      * @param int $page
      * @param int $pageSize
-     * @return EntitySeoPageList
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return LengthAwarePaginator
      */
-    public function list(int $page, int $pageSize): EntitySeoPageList
+    public function list(int $page, int $pageSize): LengthAwarePaginator
     {
-        $EntitySeoPageList = new EntitySeoPageList();
 
-        $query = $this->repository->createQueryBuilder($this->alias);
-        $query->select($this->alias)
-            ->leftJoin("$this->alias.seoPage", "seoPage");
+        $query = $this->repository->createQueryBuilder($this->alias)
+            ->select($this->alias)
+            ->leftJoin("$this->alias.seoPage", "seoPage")
+            ->orderBy("seoPage.sort")
+            ->getQuery();
 
-        $query->orderBy("seoPage.sort");
-
-        $dataPagination = PaginationHelper::paginationData($query, $pageSize, $page); // TODO Here is private package from previous job.
-
-        $EntitySeoPageList->setPageCount($dataPagination->getTotalRows());
-
-        foreach ($dataPagination->items as $item) {
-            $EntitySeoPageList->addData($item);
-        }
-
-        return $EntitySeoPageList;
+        return $this->repository->paginate($query, $pageSize, $page);
     }
 
     /**
