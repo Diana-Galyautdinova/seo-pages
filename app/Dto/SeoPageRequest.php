@@ -9,54 +9,54 @@ class SeoPageRequest implements Arrayable
 {
     /**
      * @OA\Schema(
-     *     schema="SiteSeoPage",
+     *     schema="SeoPage",
      *     @OA\Property(
      *          property="slug",
      *          type="string",
      *          example="deshovie",
-     *          description="код страницы, будет использоваться для ЧПУ"
+     *          description="Slug of page"
      *     ),
      *     @OA\Property(
      *          property="active",
      *          type="boolean",
      *          example="true",
-     *          description="активен\не активен"
+     *          description="Active\Not active"
      *     ),
      *     @OA\Property(
      *          property="seoTitle",
      *          type="string",
      *          example="Test title",
-     *          description="заголовок seo страницы"
+     *          description="Title"
      *     ),
      *     @OA\Property(
      *          property="seoH1",
      *          type="string",
      *          example="test H1",
-     *          description="H1 seo страницы"
+     *          description="H1"
      *     ),
      *     @OA\Property(
      *          property="seoKeywords",
      *          type="string",
      *          example="test Keywords",
-     *          description="Keywords seo страницы"
+     *          description="Keywords of seo page"
      *     ),
      *     @OA\Property(
      *          property="seoDescription",
      *          type="string",
      *          example="test description",
-     *          description="Description seo страницы"
+     *          description="Description"
      *     ),
      *     @OA\Property(
      *          property="seoText",
      *          type="string",
      *          example="test text",
-     *          description="text seo страницы"
+     *          description="text"
      *     ),
      *     @OA\Property(
      *          property="filters",
      *          type="object",
-     *          ref="#/components/schemas/SiteSeoPageFilter",
-     *          description="фильтры отбора объектов"
+     *          ref="#/components/schemas/SeoPageFilter",
+     *          description="Filters"
      *     ),
      *     @OA\Property(
      *          property="sort",

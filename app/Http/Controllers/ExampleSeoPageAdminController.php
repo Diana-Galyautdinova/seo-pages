@@ -11,6 +11,24 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @OA\OpenApi(
+ * @OA\Info(
+ *         version="1.0.0",
+ *         title="API SeoPages",
+ *         description="",
+ *     ),
+ * @OA\ExternalDocumentation(
+ *         description="Find out more about Swagger",
+ *         url="http://swagger.io"
+ *     )
+ * ),
+ * @OA\SecurityScheme(
+ *      securityScheme="bearer",
+ *      type="http",
+ *      scheme="bearer"
+ *  )
+ */
 class ExampleSeoPageAdminController extends Controller
 {
     public function __construct(protected SeoPageAdminService $service)
@@ -109,12 +127,7 @@ class ExampleSeoPageAdminController extends Controller
      *              property="data",
      *              type="object",
      *              ref="#/components/schemas/ExampleSeoPage"
-     *          ),
-     *          @OA\Property(
-     *              property="dictionary",
-     *              type="object",
-     *              ref="#/components/schemas/ExampleSeoPageDistrict"
-     *          ),
+     *          )
      *       ),
      *     ),
      *     @OA\Response(
@@ -156,12 +169,7 @@ class ExampleSeoPageAdminController extends Controller
      *              property="data",
      *              type="object",
      *              ref="#/components/schemas/ExampleSeoPage"
-     *          ),
-     *          @OA\Property(
-     *              property="dictionary",
-     *              type="object",
-     *              ref="#/components/schemas/ExampleSeoPageDistrict"
-     *          ),
+     *          )
      *       ),
      *     ),
      *     @OA\Response(
@@ -213,12 +221,7 @@ class ExampleSeoPageAdminController extends Controller
      *              property="data",
      *              type="object",
      *              ref="#/components/schemas/ExampleSeoPage"
-     *          ),
-     *          @OA\Property(
-     *              property="dictionary",
-     *              type="object",
-     *              ref="#/components/schemas/ExampleSeoPageDistrict"
-     *          ),
+     *          )
      *       ),
      *     ),
      *     @OA\Response(
